@@ -412,7 +412,7 @@ ax1.set_ylim(batas_bawah_wilayah, batas_atas_prediksi)
 ax1.legend()
 ax1.grid(True, alpha=0.3)
 
-st.pyplot(fig1)
+st.pyplot(fig1, use_container_width=False)
 plt.close(fig1)
 
 
@@ -470,7 +470,7 @@ ax2.set_xlim(2018, 2027)
 ax2.legend()
 ax2.grid(True, alpha=0.3)
 
-st.pyplot(fig2)
+st.pyplot(fig2, use_container_width=False)
 plt.close(fig2)
 
 
@@ -528,7 +528,7 @@ ax3.set_title("Feature Importance Random Forest")
 ax3.invert_yaxis()
 ax3.grid(axis="x", alpha=0.3)
 
-st.pyplot(fig3)
+st.pyplot(fig3, use_container_width=False)
 plt.close(fig3)
 
 
