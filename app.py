@@ -355,43 +355,62 @@ st.dataframe(
 
 st.subheader("Grafik Prediksi Tahun 2025–2027")
 
-st.markdown("**Visualisasi Perbandingan Prediksi**")
-
-tahun_terpilih = st.selectbox(
-    "Pilih Tahun untuk Ditampilkan",
-    sorted(df_future["tahun"].unique()),
-    key="pilih_tahun_prediksi"
+wilayah_terpilih_prediksi = st.selectbox(
+    "Pilih Wilayah untuk Ditampilkan",
+    sorted(df_future["nama_kabupaten_kota"].unique()),
+    key="pilih_wilayah_prediksi"
 )
 
-data_tahun_ini = df_future[
-    df_future["tahun"] == tahun_terpilih
-].sort_values("nama_kabupaten_kota")
+data_wilayah = df_future[
+    df_future["nama_kabupaten_kota"] == wilayah_terpilih_prediksi
+].sort_values("tahun")
+
+# Batas ATAS sumbu Y disamakan untuk semua wilayah
+# (minimal sampai 10000) supaya semua grafik wilayah
+# bisa dibandingkan.
+batas_atas_prediksi = max(
+    df_future["Prediksi Random Forest"].max(),
+    df_future["Prediksi Linear Regression"].max(),
+    10000
+)
+
+batas_atas_prediksi = batas_atas_prediksi * 1.05
+
+# Batas bawah dihitung dari data wilayah yang dipilih saja
+y_min_wilayah = min(
+    data_wilayah["Prediksi Random Forest"].min(),
+    data_wilayah["Prediksi Linear Regression"].min(),
+    0
+)
+
+padding_bawah = abs(y_min_wilayah) * 0.1 + 200
+batas_bawah_wilayah = y_min_wilayah - padding_bawah
 
 fig1, ax1 = plt.subplots(figsize=(10, 5))
 
-x = np.arange(len(data_tahun_ini))
-lebar = 0.35
-
-ax1.bar(
-    x - lebar / 2,
-    data_tahun_ini["Prediksi Random Forest"],
-    width=lebar,
+ax1.plot(
+    data_wilayah["tahun"],
+    data_wilayah["Prediksi Random Forest"],
+    marker="o",
     label="Random Forest"
 )
 
-ax1.bar(
-    x + lebar / 2,
-    data_tahun_ini["Prediksi Linear Regression"],
-    width=lebar,
+ax1.plot(
+    data_wilayah["tahun"],
+    data_wilayah["Prediksi Linear Regression"],
+    marker="s",
+    linestyle="--",
     label="Linear Regression"
 )
 
-ax1.set_xticks(x)
-ax1.set_xticklabels(data_tahun_ini["nama_kabupaten_kota"], rotation=15)
+ax1.set_title("Prediksi Jumlah Balita Stunting - " + str(wilayah_terpilih_prediksi))
+ax1.set_xlabel("Tahun")
 ax1.set_ylabel("Jumlah Balita Stunting")
-ax1.set_title(f"Perbandingan Prediksi Tahun {tahun_terpilih}")
+
+ax1.set_ylim(batas_bawah_wilayah, batas_atas_prediksi)
+
 ax1.legend()
-ax1.grid(axis="y", alpha=0.3)
+ax1.grid(True, alpha=0.3)
 
 st.pyplot(fig1)
 plt.close(fig1)
